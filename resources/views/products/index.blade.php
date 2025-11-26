@@ -26,7 +26,20 @@
     </header>
 
     <main class="container mx-auto py-10 px-4">
-        <h3 class="text-xl font-bold mb-6 border-l-4 border-red-600 pl-3">Katalog Terbaru</h3>
+        <h3 class="text-xl font-bold mb-7 border-l-4 border-red-600 pl-3">Katalog Terbaru</h3>
+
+        <form action="{{ route('home') }}" method="GET" class="flex w-full md:w-1/2 mb-8">
+            <input
+                type="text"
+                name="search"
+                value="{{ request('search') }}"
+                placeholder="Cari jajan atau merchandise..."
+                class="border border-gray-300 rounded-l-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-red-600"
+            >
+            <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-r-lg hover:bg-red-700 font-semibold transition">
+                Cari
+            </button>
+        </form>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach($products as $product)
