@@ -18,7 +18,8 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'Admin Ekraf',
             'email' => 'admin@ekraf.com',
-            'password' => bcrypt('password'), // Password default
+            'password' => bcrypt('password'),
+            'role' => 'admin',
         ]);
 
         // 2. Memanggil Seeder Produk (Keychain, Stiker, Kaos)
