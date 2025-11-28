@@ -3,25 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use Illuminate\Http\Request; // Pastikan baris ini ada!
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        // 1. Mulai query dasar (ambil semua produk aktif)
-        $query = Product::where('is_active', true);
+        // Ambil produk yang aktif, urutkan terbaru
+        $products = Product::where('is_active', true)->latest()->get();
 
-        // 2. Cek apakah ada pencarian?
-        if ($request->has('search')) {
-            // Filter produk yang namanya mirip dengan input user
-            $query->where('name', 'like', '%' . $request->search . '%');
-        }
-
-        // 3. Eksekusi query (ambil datanya)
-        $products = $query->latest()->get();
-
-        // 4. Kirim ke view
+        // Kirim data ke view (kita buat view-nya habis ini)
         return view('products.index', compact('products'));
     }
 }

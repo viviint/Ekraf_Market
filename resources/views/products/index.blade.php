@@ -19,9 +19,17 @@
                         <a href="/admin" class="text-yellow-300 font-bold hover:underline text-sm mr-2">Dashboard Admin</a>
                     @endif
 
-                    <a href="{{ route('cart.index') }}" class="hover:underline flex items-center gap-1">
-                        <span>Keranjang</span>
-                    </a>
+            <a href="{{ route('cart.index') }}" class="relative hover:text-gray-200 p-1 mr-4">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.023.824l.707 4.243a1.125 1.125 0 0 0 0 2.378H18.75M13.75 3h4.875a1.125 1.125 0 0 1 1.096 1.096l-1.375 6.875M16.5 13.5h.008v.008h-.008zM16.5 13.5h.008v.008h-.008zM6 18.75a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM18.75 18.75a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+                </svg>
+
+                @if (isset($cartItemCount) && $cartItemCount > 0)
+            <span class="absolute inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-800 rounded-full -top-1 right-0 border-2 border-red-700">
+                {{ $cartItemCount > 99 ? '99+' : $cartItemCount }}
+            </span>
+                @endif
+            </a>
 
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
@@ -43,10 +51,10 @@
     </nav>
 
     <header class="bg-white py-10 shadow-sm">
-        <div class="container mx-auto text-center px-4">
-            <h2 class="text-3xl font-bold text-gray-800">Merchandise & Jajan Mahasiswa [cite: 13]</h2>
-            <p class="text-gray-500 mt-2">Dukung wirausaha mahasiswa Tel-U Surabaya!</p>
-        </div>
+    <div class="container mx-auto text-center px-4">
+        <h2 class="text-3xl font-bold text-gray-800">Merchandise & Jajan Mahasiswa</h2>
+        <p class="text-gray-500 mt-2">Dukung wirausaha mahasiswa Tel-U Surabaya!</p>
+    </div>
     </header>
 
     <main class="container mx-auto py-10 px-4">
@@ -70,9 +78,9 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach($products as $product)
             <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300">
-                <div class="h-48 bg-gray-200 flex items-center justify-center">
-                    <span class="text-gray-400">Foto {{ $product->name }}</span>
-                </div>
+            <div class="h-48 bg-gray-200 flex items-center justify-center overflow-hidden">
+                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+            </div>
 
                 <div class="p-4">
                     <p class="text-xs text-red-600 font-semibold uppercase tracking-wide">
@@ -99,7 +107,7 @@
     </main>
 
     <footer class="bg-gray-800 text-white text-center py-6 mt-10">
-        <p>&copy; 2025 Kementerian Ekraf BEM Tel-U Surabaya [cite: 14, 25]</p>
+        <p>&copy; 2025 Kementerian Ekraf BEM Tel-U Surabaya</p>
     </footer>
 
 </body>
