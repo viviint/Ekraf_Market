@@ -43,10 +43,10 @@
     </nav>
 
     <header class="bg-white py-10 shadow-sm">
-        <div class="container mx-auto text-center px-4">
-            <h2 class="text-3xl font-bold text-gray-800">Merchandise & Jajan Mahasiswa [cite: 13]</h2>
-            <p class="text-gray-500 mt-2">Dukung wirausaha mahasiswa Tel-U Surabaya!</p>
-        </div>
+    <div class="container mx-auto text-center px-4">
+        <h2 class="text-3xl font-bold text-gray-800">Merchandise & Jajan Mahasiswa</h2>
+        <p class="text-gray-500 mt-2">Dukung wirausaha mahasiswa Tel-U Surabaya!</p>
+    </div>
     </header>
 
     <main class="container mx-auto py-10 px-4">
