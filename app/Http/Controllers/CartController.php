@@ -14,7 +14,7 @@ class CartController extends Controller
     public function index()
     {
         $carts = Cart::with('product')
-            ->where('user_id', Auth::id()) // Ambil punya user yang login aja
+            ->where('user_id', Auth::id())
             ->latest()
             ->get();
 
@@ -24,12 +24,11 @@ class CartController extends Controller
     // Logic Tambah Barang (Create & Update/Edit) + Validasi Stok
     public function store(Request $request, Product $product)
     {
-        // 1. Cek Stok Produk
+        // 1. Validasi Stok
         if($product->stock < 1) {
             return back()->with('error', 'Yah, stoknya habis nih!');
         }
 
-        // 2. Cek apakah barang ini sudah ada di keranjang user?
         $existingCart = Cart::where('user_id', Auth::id())
                             ->where('product_id', $product->id)
                             ->first();
@@ -37,13 +36,14 @@ class CartController extends Controller
         if ($existingCart) {
             // Kalau sudah ada, update jumlahnya (+1)
             $existingCart->increment('quantity');
+            $product->decrement('stock', 1); // <-- PENAMBAHAN 1: Kurangi stok saat item ditambah
         } else {
-            // Kalau belum, bikin data baru
             Cart::create([
                 'user_id' => Auth::id(),
                 'product_id' => $product->id,
                 'quantity' => 1
             ]);
+            $product->decrement('stock', 1); // <-- PENAMBAHAN 2: Kurangi stok saat item baru dibuat
         }
 
         return redirect()->route('cart.index')->with('success', 'Berhasil masuk keranjang!');
@@ -52,8 +52,11 @@ class CartController extends Controller
     // Logic Hapus Barang (Delete)
     public function destroy(Cart $cart)
     {
-        // Pastikan user cuma bisa hapus keranjang miliknya sendiri (Security)
         if ($cart->user_id == Auth::id()) {
+            // LOGIKA PENGEMBALIAN STOK (Wajib): Kembalikan stok saat user menghapus item dari keranjang
+            $product = $cart->product;
+            $product->increment('stock', $cart->quantity);
+
             $cart->delete();
         }
 

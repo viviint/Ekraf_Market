@@ -30,9 +30,9 @@ class ProductSeeder extends Seeder
             'name' => 'TUS Shirt Limited Edition',
             'slug' => 'tus-shirt-limited',
             'description' => 'Kaos eksklusif Telkom University Surabaya. Bahan Cotton Combed 30s.',
-            'price' => 85000,
+            'price' => 80000,
             'stock' => 50,
-            'image' => 'products/shirt.jpg',
+            'image' => 'products/tus-shirt.jpg',
             'is_active' => true,
         ]);
 
@@ -42,9 +42,9 @@ class ProductSeeder extends Seeder
             'name' => 'Keychain Akrilik Ekraf',
             'slug' => 'keychain-akrilik-ekraf',
             'description' => 'Gantungan kunci akrilik desain lucu maskot Ekraf.',
-            'price' => 15000,
+            'price' => 28000,
             'stock' => 100,
-            'image' => 'products/keychain.jpg',
+            'image' => 'keychain.jpg',
             'is_active' => true,
         ]);
 
@@ -54,9 +54,9 @@ class ProductSeeder extends Seeder
             'name' => 'Sticker Pack Edisi Kampus',
             'slug' => 'sticker-pack-kampus',
             'description' => 'Satu pack isi 5 stiker vinyl anti air.',
-            'price' => 12000,
+            'price' => 10000,
             'stock' => 75,
-            'image' => 'products/sticker.jpg',
+            'image' => 'sticker-pack.jpg',
             'is_active' => true,
         ]);
     }

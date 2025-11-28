@@ -8,7 +8,6 @@
 </head>
 <body class="bg-gray-50 font-sans">
 
-    <!-- Navbar Simple -->
     <nav class="bg-red-700 text-white p-4 shadow-md sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-2xl font-bold">EKRAF MARKET</h1>
@@ -21,26 +20,18 @@
     <main class="container mx-auto py-10 px-4">
         <h2 class="text-2xl font-bold mb-6 border-b pb-2 border-gray-300">Keranjang Belanja</h2>
 
-        <!-- Alert Notifikasi -->
         @if(session('success'))
             <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
                 {{ session('success') }}
             </div>
         @endif
-        @if(session('error'))
-            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
-                {{ session('error') }}
-            </div>
-        @endif
 
         @if($carts->isEmpty())
-            <!-- Tampilan Kalau Kosong -->
             <div class="text-center py-16 bg-white rounded-lg shadow-sm border border-gray-100">
                 <p class="text-gray-500 text-lg mb-4">Keranjang kamu masih kosong nih.</p>
                 <a href="{{ route('home') }}" class="bg-red-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-red-700 transition">Mulai Belanja</a>
             </div>
         @else
-            <!-- Tabel Keranjang -->
             <div class="bg-white rounded-lg shadow overflow-hidden">
                 <table class="w-full text-left">
                     <thead class="bg-gray-100 border-b text-gray-600 uppercase text-xs">
