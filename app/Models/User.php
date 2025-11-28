@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role', //
     ];
 
     /**
@@ -44,5 +45,23 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // --- HELPER ROLE (BARIS TAMBAHAN) ---
+
+    /**
+     * Cek apakah user memiliki peran Admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Cek apakah user memiliki peran Mahasiswa (User Biasa).
+     */
+    public function isMahasiswa(): bool
+    {
+        return $this->role === 'mahasiswa';
     }
 }
