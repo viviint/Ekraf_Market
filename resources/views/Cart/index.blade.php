@@ -76,15 +76,11 @@
                 <div class="p-6 bg-gray-50 border-t flex flex-col md:flex-row justify-between items-center gap-4">
                     <div class="text-lg">Total Belanja: <span class="text-2xl font-bold text-red-700">Rp {{ number_format($grandTotal, 0, ',', '.') }}</span></div>
 
-                    <button class="bg-gray-800 text-white px-8 py-3 rounded-lg font-bold hover:bg-gray-900 transition w-full md:w-auto opacity-50 cursor-not-allowed">
-                        Checkout (Sprint 2)
-                    </button>
+                    <a href="{{ route('checkout.index') }}" class="bg-red-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-red-700 transition shadow-lg text-center">
+                        Lanjut ke Checkout
+                    </a>
                 </div>
             </div>
         @endif
     </main>
-    <footer class="bg-gray-800 text-white text-center py-6 mt-10">
-        <p>&copy; 2025 Kementerian Ekraf BEM Tel-U Surabaya</p>
-    </footer>
-</body>
-</html>
+    <footer class="bg-gray-80
