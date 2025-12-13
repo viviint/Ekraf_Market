@@ -25,9 +25,10 @@ class CheckoutController extends Controller
     // 2. Proses Checkout (Simpan ke Database)
     public function store(Request $request)
     {
-        // Validasi input pembayaran
+        // 1. VALIDASI DILONGGARKAN
+        // Kita cuma validasi payment_method karena cuma itu yang ada di form
         $request->validate([
-            'payment_method' => 'required|in:cod,qris,bank,ewallet',
+            'payment_method' => 'required',
         ]);
 
         $carts = Cart::where('user_id', Auth::id())->get();
@@ -38,27 +39,36 @@ class CheckoutController extends Controller
             $totalPrice += $cart->product->price * $cart->quantity;
         }
 
-        // A. Buat Order Baru
+        // 2. Buat Order Baru
         $order = Order::create([
             'user_id' => Auth::id(),
-            'status' => 'pending',
+            'invoice_number' => 'INV-' . time(),
+            'status' => 'Menunggu Pembayaran',
+            'total_amount' => $totalPrice,
             'payment_method' => $request->payment_method,
-            'total_price' => $totalPrice,
+
+            // AUTO FILL: Karena di form gak ada inputnya, kita isi otomatis dulu
+            'shipping_name' => Auth::user()->name,
+            'shipping_address' => 'Alamat sesuai profil (Belum diisi)', // Default dulu biar gak error
+            'shipping_phone' => '-', // Default strip dulu
         ]);
 
-        // B. Pindahkan Item Keranjang ke OrderItems
+        // 3. Pindahkan Item ke OrderItems
         foreach($carts as $cart) {
-            OrderItem::create([
+            \Illuminate\Support\Facades\DB::table('order_items')->insert([
                 'order_id' => $order->id,
                 'product_id' => $cart->product_id,
                 'quantity' => $cart->quantity,
                 'price' => $cart->product->price,
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
         }
 
-        // C. Kosongkan Keranjang (Stok sudah dikurangi saat Add to Cart di Sprint 1)
+        // 4. Hapus Keranjang
         Cart::where('user_id', Auth::id())->delete();
 
-        return redirect()->route('products.index')->with('success', 'Checkout Berhasil! Pesanan sedang diproses.');
+        // 5. Redirect ke Riwayat Pesanan
+        return redirect()->route('orders.index')->with('success', 'Checkout Berhasil! Silakan upload bukti pembayaran.');
     }
 }
