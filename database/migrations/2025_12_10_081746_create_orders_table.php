@@ -6,24 +6,31 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-        $table->string('status')->default('pending'); // pending, paid, shipped
-        $table->string('payment_method'); // cod, qris, bank, ewallet
-        $table->decimal('total_price', 15, 2);
-        $table->timestamps();
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+
+            // KOLOM BARU YANG WAJIB ADA (Biar gak error kayak tadi)
+            $table->string('invoice_number')->unique();
+            $table->string('status')->default('Menunggu Pembayaran');
+            $table->unsignedBigInteger('total_amount');
+            $table->string('payment_method');
+
+            // Detail Pengiriman (Auto-fill dari controller)
+            $table->string('shipping_name');
+            $table->string('shipping_address');
+            $table->string('shipping_phone');
+
+            // Bukti Bayar
+            $table->string('payment_proof')->nullable();
+            $table->timestamp('paid_at')->nullable();
+
+            $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('orders');
