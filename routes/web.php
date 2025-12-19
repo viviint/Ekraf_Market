@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
@@ -33,23 +32,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders/{order}/payment', [OrderController::class, 'showPaymentForm'])->name('orders.payment');
     Route::post('/orders/{order}/payment', [OrderController::class, 'uploadPaymentProof'])->name('orders.upload');
 
-    // 5. Rute Profile User (Bawaan Breeze)
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
 });
 
 // --- AREA KHUSUS ADMIN (Dilindungi Gate 'admin') ---
 // Ini yang bikin cuma admin yang bisa masuk /admin
-Route::middleware(['auth', 'can:admin'])->prefix('admin')->group(function () {
+// Route::middleware(['auth', 'can:admin'])->prefix('admin')->group(function () {
 
-    // Dashboard Admin
-    Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
+//     // Dashboard Admin
+//     Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
 
-    // Tombol Verifikasi Pembayaran
-    Route::post('/orders/{order}/verify', [AdminController::class, 'verifyPayment'])->name('admin.orders.verify');
-});
-
-// Load rute Login/Register/Logout bawaan Breeze
-require __DIR__.'/auth.php';
+//     // Tombol Verifikasi Pembayaran
+//     Route::post('/orders/{order}/verify', [AdminController::class, 'verifyPayment'])->name('admin.orders.verify');
+// });

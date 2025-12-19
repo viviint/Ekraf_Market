@@ -25,8 +25,10 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('admin')
+            ->path('dashboard') // Dashboard at /dashboard, login at /dashboard/login
             ->login()
+            ->registration() // Enable public registration
+            ->profile() // Enable profile management
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -39,6 +41,10 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
+                \App\Filament\Widgets\SalesOverview::class,
+                \App\Filament\Widgets\SalesChart::class,
+                \App\Filament\Widgets\LatestOrders::class,
+                \App\Filament\Widgets\LowStockProducts::class,
             ])
             ->middleware([
                 EncryptCookies::class,

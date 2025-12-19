@@ -34,14 +34,16 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
+                        {{-- Profile link using Filament --}}
+                        <x-dropdown-link href="{{ route('filament.admin.pages.profile') }}">
                             {{ __('Profile') }}
                         </x-dropdown-link>
 
-                        <form method="POST" action="{{ route('logout') }}">
+                        {{-- Logout using Filament --}}
+                        <form method="POST" action="{{ route('filament.admin.auth.logout') }}">
                             @csrf
 
-                            <x-dropdown-link :href="route('logout')"
+                            <x-dropdown-link href="{{ route('filament.admin.auth.logout') }}"
                                     onclick="event.preventDefault();
                                                 this.closest('form').submit();">
                                 {{ __('Log Out') }}
@@ -80,14 +82,16 @@
             </div>
 
             <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
+                {{-- Profile link using Filament --}}
+                <x-responsive-nav-link href="{{ route('filament.admin.pages.profile') }}">
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
 
-                <form method="POST" action="{{ route('logout') }}">
+                {{-- Logout using Filament --}}
+                <form method="POST" action="{{ route('filament.admin.auth.logout') }}">
                     @csrf
 
-                    <x-responsive-nav-link :href="route('logout')"
+                    <x-responsive-nav-link href="{{ route('filament.admin.auth.logout') }}"
                             onclick="event.preventDefault();
                                         this.closest('form').submit();">
                         {{ __('Log Out') }}

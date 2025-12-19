@@ -16,7 +16,7 @@
             <div class="flex items-center gap-4">
                 @auth
                     @if(auth()->user()->isAdmin())
-                        <a href="/admin" class="text-yellow-300 font-bold hover:underline text-sm mr-2">Dashboard Admin</a>
+                        <a href="/dashboard" class="text-yellow-300 font-bold hover:underline text-sm mr-2">Dashboard Admin</a>
                     @endif
 
             <a href="{{ route('cart.index') }}" class="relative hover:text-gray-200 p-1 mr-4">
@@ -31,7 +31,7 @@
                 @endif
             </a>
 
-                    <form method="POST" action="{{ route('logout') }}">
+                    <form method="POST" action="{{ route('filament.admin.auth.logout') }}">
                         @csrf
                         <button type="submit" class="bg-white text-red-700 px-4 py-2 rounded font-semibold text-sm hover:bg-gray-100">
                             Logout
@@ -39,10 +39,10 @@
                     </form>
 
                 @else
-                    <a href="{{ route('login') }}" class="bg-white text-red-700 px-4 py-2 rounded font-semibold text-sm hover:bg-gray-100">
+                    <a href="{{ route('filament.admin.auth.login') }}" class="bg-white text-red-700 px-4 py-2 rounded font-semibold text-sm hover:bg-gray-100">
                         Login
                     </a>
-                    <a href="{{ route('register') }}" class="text-white hover:underline text-sm">
+                    <a href="{{ route('filament.admin.auth.register') }}" class="text-white hover:underline text-sm">
                         Daftar
                     </a>
                 @endauth
