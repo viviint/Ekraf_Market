@@ -26,8 +26,8 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('dashboard') // Dashboard at /dashboard, login at /dashboard/login
-            ->login()
-            ->registration() // Enable public registration
+            ->login(\App\Filament\Pages\Auth\CustomLogin::class)
+            ->registration(\App\Filament\Pages\Auth\CustomRegister::class) // Enable public registration with custom redirect
             ->profile() // Enable profile management
             ->colors([
                 'primary' => Color::Amber,
@@ -59,6 +59,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                \App\Http\Middleware\RedirectIfUserNotAdmin::class, // <-- Tambahkan ini untuk protect dashboard
             ]);
     }
 }

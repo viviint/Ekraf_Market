@@ -49,7 +49,6 @@ class User extends Authenticatable implements FilamentUser
         ];
     }
 
-    // --- HELPER ROLE (BARIS TAMBAHAN) ---
 
     /**
      * Cek apakah user memiliki peran Admin.

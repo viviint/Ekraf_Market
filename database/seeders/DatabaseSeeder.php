@@ -13,8 +13,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Membuat User Admin/Test (Biar nanti bisa login)
-        // Kita pakai 'firstOrCreate' biar tidak error kalau dijalankan berulang
         User::factory()->create([
             'name' => 'Admin Ekraf',
             'email' => 'admin@ekraf.com',
@@ -22,9 +20,7 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin',
         ]);
 
-        // 2. Memanggil Seeder Produk (Keychain, Stiker, Kaos)
-        // Ini bagian penting yang kita tambahkan:
-        $this->call([
+          $this->call([
             ProductSeeder::class,
         ]);
     }
