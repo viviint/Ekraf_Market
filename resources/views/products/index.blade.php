@@ -31,7 +31,7 @@
                 @endif
             </a>
 
-                    <form method="POST" action="{{ route('filament.admin.auth.logout') }}">
+                    <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="bg-white text-red-700 px-4 py-2 rounded font-semibold text-sm hover:bg-gray-100">
                             Logout

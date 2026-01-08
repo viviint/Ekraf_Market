@@ -13,7 +13,8 @@
             <h1 class="text-2xl font-bold">EKRAF MARKET</h1>
             <div class="flex gap-4">
                 <a href="{{ route('home') }}" class="hover:underline">Lanjut Belanja</a>
-                <a href="{{ route('profile.edit') }}" class="font-bold">Akun Saya</a>
+                <a href="{{ route('home') }}" class="hover:underline">Lanjut Belanja</a>
+                {{-- <a href="{{ route('profile.edit') }}" class="font-bold">Akun Saya</a> --}}
             </div>
         </div>
     </nav>

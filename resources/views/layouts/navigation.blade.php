@@ -35,19 +35,18 @@
 
                     <x-slot name="content">
                         {{-- Profile link using Filament --}}
-                        <x-dropdown-link href="{{ route('filament.admin.pages.profile') }}">
+                        {{-- Profile link using Filament --}}
+                        {{-- <x-dropdown-link href="{{ route('filament.admin.pages.profile') }}">
                             {{ __('Profile') }}
-                        </x-dropdown-link>
+                        </x-dropdown-link> --}}
 
-                        {{-- Logout using Filament --}}
-                        <form method="POST" action="{{ route('filament.admin.auth.logout') }}">
+
+                        {{-- Logout using Standard Route --}}
+                        <form method="POST" action="{{ route('logout') }}">
                             @csrf
-
-                            <x-dropdown-link href="{{ route('filament.admin.auth.logout') }}"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
+                            <button type="submit" class="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out">
                                 {{ __('Log Out') }}
-                            </x-dropdown-link>
+                            </button>
                         </form>
                     </x-slot>
                 </x-dropdown>
@@ -83,19 +82,18 @@
 
             <div class="mt-3 space-y-1">
                 {{-- Profile link using Filament --}}
-                <x-responsive-nav-link href="{{ route('filament.admin.pages.profile') }}">
+                {{-- Profile link using Filament --}}
+                {{-- <x-responsive-nav-link href="{{ route('filament.admin.pages.profile') }}">
                     {{ __('Profile') }}
-                </x-responsive-nav-link>
+                </x-responsive-nav-link> --}}
 
-                {{-- Logout using Filament --}}
-                <form method="POST" action="{{ route('filament.admin.auth.logout') }}">
+
+                {{-- Logout using Standard Route --}}
+                <form method="POST" action="{{ route('logout') }}">
                     @csrf
-
-                    <x-responsive-nav-link href="{{ route('filament.admin.auth.logout') }}"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();">
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
+                    <button type="submit" class="block w-full ps-3 pe-4 py-2 border-l-4 border-transparent text-start text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 transition duration-150 ease-in-out">
+                         {{ __('Log Out') }}
+                    </button>
                 </form>
             </div>
         </div>

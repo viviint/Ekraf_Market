@@ -32,6 +32,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders/{order}/payment', [OrderController::class, 'showPaymentForm'])->name('orders.payment');
     Route::post('/orders/{order}/payment', [OrderController::class, 'uploadPaymentProof'])->name('orders.upload');
 
+    // 5. Rute Logout Khusus Frontend
+    Route::post('/logout', function () {
+        Illuminate\Support\Facades\Auth::guard('web')->logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+        return redirect()->route('filament.admin.auth.login');
+    })->name('logout');
+
 });
 
 // --- AREA KHUSUS ADMIN (Dilindungi Gate 'admin') ---
