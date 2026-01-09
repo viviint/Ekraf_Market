@@ -12,23 +12,20 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        // Ambil query pencarian dari URL (misalnya ?search=baju)
         $search = $request->query('search');
 
-        // Mulai Query Builder
-        $query = Product::with('category');
+        // withAvg buat ngitung rata-rata bintang review
+        $query = Product::with('category')
+                        ->withAvg('reviews', 'rating');
 
-        // Jika ada input pencarian, terapkan filter
         if ($search) {
             $query->where('name', 'like', '%' . $search . '%')
                   ->orWhere('description', 'like', '%' . $search . '%');
         }
 
-        // Ambil data produk
         $products = $query->latest()->get();
 
+        // KEMBALI KE 'products.index'
         return view('products.index', compact('products'));
     }
-
-    // ... (method lain di bawahnya)
 }
