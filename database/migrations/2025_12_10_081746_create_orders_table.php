@@ -25,6 +25,7 @@ return new class extends Migration
 
             // Bukti Bayar
             $table->string('payment_proof')->nullable();
+            $table->string('resi')->nullable();
             $table->timestamp('paid_at')->nullable();
 
             $table->timestamps();

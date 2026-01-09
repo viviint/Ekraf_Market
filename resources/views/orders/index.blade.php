@@ -13,7 +13,6 @@
             <h1 class="text-2xl font-bold">EKRAF MARKET</h1>
             <div class="flex gap-4">
                 <a href="{{ route('home') }}" class="hover:underline">Lanjut Belanja</a>
-                <a href="{{ route('home') }}" class="hover:underline">Lanjut Belanja</a>
                 {{-- <a href="{{ route('profile.edit') }}" class="font-bold">Akun Saya</a> --}}
             </div>
         </div>
@@ -36,31 +35,64 @@
         @else
             <div class="space-y-4">
                 @foreach($orders as $order)
-                <div class="bg-white rounded-lg shadow p-6 border border-gray-100">
+                <div class="bg-white rounded-lg shadow p-6 border border-gray-100 relative overflow-hidden">
+
+                    {{-- Header Card: Invoice & Status --}}
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
                         <div>
                             <p class="text-sm text-gray-500">No. Invoice: <span class="font-mono font-bold text-gray-800">#{{ $order->invoice_number }}</span></p>
                             <p class="text-xs text-gray-400">{{ $order->created_at->format('d M Y, H:i') }}</p>
                         </div>
                         <div class="mt-2 md:mt-0">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold
-                                {{ $order->status == 'Menunggu Pembayaran' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                {{ $order->status == 'Menunggu Verifikasi' ? 'bg-blue-100 text-blue-800' : '' }}
-                                {{ $order->status == 'Diproses' ? 'bg-purple-100 text-purple-800' : '' }}
-                                {{ $order->status == 'Selesai' ? 'bg-green-100 text-green-800' : '' }}
-                            ">
+                            {{-- Logic Warna Status --}}
+                            @php
+                                $statusColor = match($order->status) {
+                                    'Menunggu Pembayaran' => 'bg-yellow-100 text-yellow-800',
+                                    'Menunggu Verifikasi' => 'bg-blue-100 text-blue-800',
+                                    'paid' => 'bg-blue-100 text-blue-800', // Jaga-jaga kalau admin simpan key 'paid'
+                                    'Diproses' => 'bg-purple-100 text-purple-800',
+                                    'Sedang Dikirim' => 'bg-indigo-100 text-indigo-800',
+                                    'shipping' => 'bg-indigo-100 text-indigo-800', // Jaga-jaga kalau admin simpan key 'shipping'
+                                    'Selesai' => 'bg-green-100 text-green-800',
+                                    'completed' => 'bg-green-100 text-green-800',
+                                    default => 'bg-gray-100 text-gray-800'
+                                };
+                            @endphp
+                            <span class="px-3 py-1 rounded-full text-xs font-bold {{ $statusColor }}">
                                 {{ $order->status }}
                             </span>
                         </div>
                     </div>
 
+                    {{-- BAGIAN BARU: TAMPILAN RESI --}}
+                    {{-- Hanya muncul kalau kolom 'resi' di database ada isinya --}}
+                    @if($order->resi)
+                    <div class="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3 flex flex-col sm:flex-row justify-between items-center animate-pulse-once">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-blue-500 text-white p-2 rounded-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-blue-600 font-bold uppercase">Nomor Resi Pengiriman</p>
+                                <p class="text-lg font-mono font-bold text-gray-800 tracking-wider">{{ $order->resi }}</p>
+                            </div>
+                        </div>
+                        <div class="mt-2 sm:mt-0">
+                            <span class="text-xs font-semibold text-gray-500 bg-white px-2 py-1 rounded border">Ekspedisi: JNE / J&T</span>
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Footer Card: Total & Tombol --}}
                     <div class="flex justify-between items-center border-t pt-4">
                         <div>
                             <p class="text-sm text-gray-500">Total Tagihan:</p>
                             <p class="text-xl font-bold text-red-600">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</p>
                         </div>
 
-                        @if($order->status == 'Menunggu Pembayaran')
+                        @if($order->status == 'Menunggu Pembayaran' || $order->status == 'pending')
                             <a href="{{ route('orders.payment', $order) }}" class="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-red-700 font-semibold text-sm transition">
                                 Upload Bukti Bayar &rarr;
                             </a>
