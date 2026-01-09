@@ -4,22 +4,22 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Product;
-use App\Models\Category;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Notifications\Notification as FilamentNotification;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-cube';
-    
+
     protected static ?string $navigationGroup = 'Manajemen Produk';
-    
+
     protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
@@ -37,38 +37,38 @@ class ProductResource extends Resource
                             ->required()
                             ->maxLength(255),
                     ]),
-                    
+
                 Forms\Components\TextInput::make('name')
                     ->label('Nama Produk')
                     ->required()
                     ->maxLength(255),
-                    
+
                 Forms\Components\Textarea::make('description')
                     ->label('Deskripsi')
                     ->required()
                     ->rows(4)
                     ->columnSpanFull(),
-                    
+
                 Forms\Components\TextInput::make('price')
                     ->label('Harga')
                     ->required()
                     ->numeric()
                     ->prefix('Rp')
                     ->minValue(0),
-                    
+
                 Forms\Components\TextInput::make('stock')
-                    ->label('Stok')
+                    ->label('Stok Awal')
                     ->required()
                     ->numeric()
                     ->minValue(0)
                     ->default(0)
-                    ->helperText('Notifikasi akan muncul jika stok < 10'),
-                    
+                    ->helperText('Gunakan fitur "Update Stok" di tabel untuk penyesuaian cepat.'),
+
                 Forms\Components\FileUpload::make('image')
                     ->label('Foto Produk')
                     ->image()
                     ->directory('products')
-                    ->imageEditor()
+                    ->imageEditor() // Fitur crop bawaan filament
                     ->maxSize(2048),
             ]);
     }
@@ -79,36 +79,42 @@ class ProductResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('image')
                     ->label('Foto')
-                    ->size(60)
+                    ->size(50)
                     ->circular(),
-                    
+
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama Produk')
                     ->searchable()
-                    ->sortable(),
-                    
+                    ->sortable()
+                    ->weight('bold'),
+
                 Tables\Columns\TextColumn::make('category.name')
                     ->label('Kategori')
                     ->badge()
-                    ->searchable()
+                    ->color('info')
                     ->sortable(),
-                    
+
                 Tables\Columns\TextColumn::make('price')
                     ->label('Harga')
                     ->money('IDR')
                     ->sortable(),
-                    
+
+                // --- BAGIAN LOGIC WARNA STOK ---
                 Tables\Columns\TextColumn::make('stock')
-                    ->label('Stok')
+                    ->label('Sisa Stok')
                     ->numeric()
                     ->sortable()
                     ->badge()
-                    ->color(fn (int $state): string => match (true) {
-                        $state === 0 => 'danger',
-                        $state < 10 => 'warning',
-                        default => 'success',
+                    ->color(fn (string $state): string => match (true) {
+                        (int)$state <= 5 => 'danger',   // Merah (Kritis)
+                        (int)$state <= 20 => 'warning', // Kuning (Menipis)
+                        default => 'success',           // Hijau (Aman)
+                    })
+                    ->icon(fn (string $state): ?string => match (true) {
+                        (int)$state <= 5 => 'heroicon-m-exclamation-circle', // Ikon peringatan
+                        default => null,
                     }),
-                    
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d M Y')
@@ -116,46 +122,57 @@ class ProductResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                // Filter Kategori
                 Tables\Filters\SelectFilter::make('category')
                     ->relationship('category', 'name')
                     ->label('Kategori'),
-                    
-                Tables\Filters\Filter::make('low_stock')
-                    ->label('Stok Rendah')
-                    ->query(fn ($query) => $query->where('stock', '<', 10)),
-                    
-                Tables\Filters\Filter::make('out_of_stock')
-                    ->label('Stok Habis')
-                    ->query(fn ($query) => $query->where('stock', 0)),
+
+                // Filter Stok Kritis (< 10)
+                Tables\Filters\Filter::make('critical_stock')
+                    ->label('Stok Kritis (< 10)')
+                    ->query(fn (Builder $query) => $query->where('stock', '<', 10))
+                    ->indicator('Stok Kritis'), // Muncul badge di atas tabel kalau aktif
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                
-                // Manual Stock Update Action
+                // Fitur Keren: Update Stok Tanpa Edit Halaman
                 Tables\Actions\Action::make('update_stock')
                     ->label('Update Stok')
-                    ->icon('heroicon-o-arrow-path')
+                    ->icon('heroicon-o-archive-box-arrow-down')
                     ->color('warning')
+                    ->modalWidth('sm')
                     ->form([
                         Forms\Components\TextInput::make('stock_adjustment')
-                            ->label('Jumlah (+ untuk tambah, - untuk kurangi)')
+                            ->label('Penyesuaian Stok')
                             ->numeric()
                             ->required()
-                            ->helperText('Contoh: +10 untuk menambah 10, -5 untuk mengurangi 5'),
+                            ->helperText('Masukkan angka positif (+) untuk menambah, atau negatif (-) untuk mengurangi.')
+                            ->placeholder('Contoh: 10 atau -5'),
                     ])
                     ->action(function (Product $record, array $data) {
                         $adjustment = (int) $data['stock_adjustment'];
-                        $newStock = max(0, $record->stock + $adjustment);
+                        $newStock = $record->stock + $adjustment;
+
+                        // Cegah stok minus
+                        if ($newStock < 0) {
+                             FilamentNotification::make()
+                                ->title('Gagal!')
+                                ->body('Stok tidak boleh kurang dari 0.')
+                                ->danger()
+                                ->send();
+                             return;
+                        }
+
                         $record->update(['stock' => $newStock]);
-                        
+
                         FilamentNotification::make()
-                            ->title('Stok berhasil diupdate')
-                            ->body("Produk: {$record->name}, Stok baru: {$newStock}")
+                            ->title('Stok Berhasil Diupdate')
+                            ->body("Stok {$record->name} sekarang: {$newStock}")
                             ->success()
                             ->send();
                     }),
+
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -180,10 +197,10 @@ class ProductResource extends Resource
             'edit' => Pages\EditProduct::route('/{record}/edit'),
         ];
     }
-    
-    // Hide from mahasiswa
+
+    // Biar cuma admin yang bisa akses
     public static function canViewAny(): bool
     {
-        return auth()->user()->isAdmin();
+        return auth()->user() && auth()->user()->isAdmin();
     }
 }

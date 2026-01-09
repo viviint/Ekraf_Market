@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ekraf Market - Telkom University Surabaya [cite: 9]</title>
+    <title>Ekraf Market - Telkom University Surabaya</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -19,17 +19,17 @@
                         <a href="/dashboard" class="text-yellow-300 font-bold hover:underline text-sm mr-2">Dashboard Admin</a>
                     @endif
 
-            <a href="{{ route('cart.index') }}" class="relative hover:text-gray-200 p-1 mr-4">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.023.824l.707 4.243a1.125 1.125 0 0 0 0 2.378H18.75M13.75 3h4.875a1.125 1.125 0 0 1 1.096 1.096l-1.375 6.875M16.5 13.5h.008v.008h-.008zM16.5 13.5h.008v.008h-.008zM6 18.75a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM18.75 18.75a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
-                </svg>
+                    <a href="{{ route('cart.index') }}" class="relative hover:text-gray-200 p-1 mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.023.824l.707 4.243a1.125 1.125 0 0 0 0 2.378H18.75M13.75 3h4.875a1.125 1.125 0 0 1 1.096 1.096l-1.375 6.875M16.5 13.5h.008v.008h-.008zM16.5 13.5h.008v.008h-.008zM6 18.75a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM18.75 18.75a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+                        </svg>
 
-                @if (isset($cartItemCount) && $cartItemCount > 0)
-            <span class="absolute inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-800 rounded-full -top-1 right-0 border-2 border-red-700">
-                {{ $cartItemCount > 99 ? '99+' : $cartItemCount }}
-            </span>
-                @endif
-            </a>
+                        @if (isset($cartItemCount) && $cartItemCount > 0)
+                        <span class="absolute inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-800 rounded-full -top-1 right-0 border-2 border-red-700">
+                            {{ $cartItemCount > 99 ? '99+' : $cartItemCount }}
+                        </span>
+                        @endif
+                    </a>
 
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
@@ -77,27 +77,38 @@
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach($products as $product)
-            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300 flex flex-col h-full">
             <div class="h-48 bg-gray-200 flex items-center justify-center overflow-hidden">
                 <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
             </div>
 
-                <div class="p-4">
+                <div class="p-4 flex flex-col flex-grow">
                     <p class="text-xs text-red-600 font-semibold uppercase tracking-wide">
                         {{ $product->category->name ?? 'Umum' }}
                     </p>
                     <h3 class="text-lg font-bold text-gray-900 mt-1">{{ $product->name }}</h3>
                     <p class="text-gray-500 text-sm mt-1 line-clamp-2">{{ $product->description }}</p>
 
-                    <div class="flex items-center justify-between mt-4">
+                    <div class="mt-auto pt-4 flex items-center justify-between">
                         <span class="text-lg font-bold text-gray-900">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
 
-                        <form action="{{ route('cart.store', $product->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="bg-red-600 text-white px-3 py-1 rounded-md text-sm hover:bg-red-700">
-                                + Keranjang
+                        {{-- LOGIKA TOMBOL STOK DIMULAI DISINI --}}
+                        @if($product->stock > 0)
+                            {{-- Kalau Stok Ada --}}
+                            <form action="{{ route('cart.store', $product->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="bg-red-600 text-white px-3 py-1 rounded-md text-sm hover:bg-red-700">
+                                    + Keranjang
+                                </button>
+                            </form>
+                        @else
+                            {{-- Kalau Stok Kosong (0) --}}
+                            <button disabled class="bg-gray-300 text-gray-500 cursor-not-allowed px-3 py-1 rounded-md text-sm font-bold shadow-none">
+                                Habis 🚫
                             </button>
-                        </form>
+                        @endif
+                        {{-- LOGIKA SELESAI --}}
+
                     </div>
                     <p class="text-xs text-gray-400 mt-2 text-right">Stok: {{ $product->stock }}</p>
                 </div>
