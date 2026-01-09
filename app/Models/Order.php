@@ -20,4 +20,12 @@ class Order extends Model
     public function items() {
         return $this->hasMany(OrderItem::class);
     }
+
+    public function products()
+    {
+        // Ini asumsi abang punya tabel pivot 'order_items' yang nyimpen product_id
+        // withPivot buat ambil data jumlah (quantity) dan harga pas beli
+        return $this->belongsToMany(Product::class, 'order_items')
+                    ->withPivot('quantity', 'price');
+    }
 }

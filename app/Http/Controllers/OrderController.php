@@ -12,7 +12,10 @@ class OrderController extends Controller
     // 1. Menampilkan Daftar Pesanan User (History)
     public function index()
     {
+        // TAMBAHAN: ->with('products')
+        // Ini wajib biar kita bisa meloop barang apa aja yg dibeli di view nanti
         $orders = Order::where('user_id', Auth::id())
+                        ->with('products')
                         ->latest()
                         ->get();
 
@@ -22,13 +25,11 @@ class OrderController extends Controller
     // 2. Menampilkan Form Upload Bukti Bayar
     public function showPaymentForm(Order $order)
     {
-        // Pastikan user cuma bisa lihat orderannya sendiri
         if ($order->user_id !== Auth::id()) {
             abort(403);
         }
 
-        // Kalau sudah dibayar, jangan kasih upload lagi
-        if ($order->status !== 'Menunggu Pembayaran') {
+        if ($order->status !== 'Menunggu Pembayaran' && $order->status !== 'pending') {
             return redirect()->route('orders.index')->with('error', 'Pesanan ini sudah diproses.');
         }
 
@@ -38,20 +39,16 @@ class OrderController extends Controller
     // 3. Proses Simpan Gambar Bukti Bayar
     public function uploadPaymentProof(Request $request, Order $order)
     {
-        // Validasi input harus gambar (jpg, png, jpeg) max 2MB
         $request->validate([
             'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Simpan gambar ke folder 'public/payment_proofs'
         if ($request->hasFile('payment_proof')) {
-            // Pastikan folder storage sudah di-link: php artisan storage:link
             $path = $request->file('payment_proof')->store('payment_proofs', 'public');
 
-            // Update Database
             $order->update([
                 'payment_proof' => $path,
-                'status' => 'Menunggu Verifikasi', // Ganti status biar Admin tahu
+                'status' => 'Menunggu Verifikasi',
             ]);
         }
 

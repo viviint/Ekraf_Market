@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Riwayat Pesanan - Ekraf Market</title>
+    {{-- Pastikan AlpineJS jalan buat dropdown review --}}
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-50 font-sans">
@@ -13,7 +15,6 @@
             <h1 class="text-2xl font-bold">EKRAF MARKET</h1>
             <div class="flex gap-4">
                 <a href="{{ route('home') }}" class="hover:underline">Lanjut Belanja</a>
-                {{-- <a href="{{ route('profile.edit') }}" class="font-bold">Akun Saya</a> --}}
             </div>
         </div>
     </nav>
@@ -27,6 +28,12 @@
             </div>
         @endif
 
+        @if(session('error'))
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+                {{ session('error') }}
+            </div>
+        @endif
+
         @if($orders->isEmpty())
             <div class="text-center py-16 bg-white rounded-lg shadow-sm border border-gray-100">
                 <p class="text-gray-500 text-lg mb-4">Belum ada pesanan nih.</p>
@@ -35,37 +42,33 @@
         @else
             <div class="space-y-4">
                 @foreach($orders as $order)
-                <div class="bg-white rounded-lg shadow p-6 border border-gray-100 relative overflow-hidden">
+                {{-- HAPUS overflow-hidden DISINI BIAR DROPDOWN GAK KEPOTONG --}}
+                <div class="bg-white rounded-lg shadow p-6 border border-gray-100 relative">
 
                     {{-- Header Card: Invoice & Status --}}
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 border-b pb-4">
                         <div>
                             <p class="text-sm text-gray-500">No. Invoice: <span class="font-mono font-bold text-gray-800">#{{ $order->invoice_number }}</span></p>
                             <p class="text-xs text-gray-400">{{ $order->created_at->format('d M Y, H:i') }}</p>
                         </div>
                         <div class="mt-2 md:mt-0">
-                            {{-- Logic Warna Status --}}
                             @php
                                 $statusColor = match($order->status) {
-                                    'Menunggu Pembayaran' => 'bg-yellow-100 text-yellow-800',
+                                    'Menunggu Pembayaran', 'pending' => 'bg-yellow-100 text-yellow-800',
                                     'Menunggu Verifikasi' => 'bg-blue-100 text-blue-800',
-                                    'paid' => 'bg-blue-100 text-blue-800', // Jaga-jaga kalau admin simpan key 'paid'
                                     'Diproses' => 'bg-purple-100 text-purple-800',
-                                    'Sedang Dikirim' => 'bg-indigo-100 text-indigo-800',
-                                    'shipping' => 'bg-indigo-100 text-indigo-800', // Jaga-jaga kalau admin simpan key 'shipping'
-                                    'Selesai' => 'bg-green-100 text-green-800',
-                                    'completed' => 'bg-green-100 text-green-800',
+                                    'Sedang Dikirim', 'shipping' => 'bg-indigo-100 text-indigo-800',
+                                    'Selesai', 'completed' => 'bg-green-100 text-green-800',
                                     default => 'bg-gray-100 text-gray-800'
                                 };
                             @endphp
                             <span class="px-3 py-1 rounded-full text-xs font-bold {{ $statusColor }}">
-                                {{ $order->status }}
+                                {{ ucfirst($order->status) }}
                             </span>
                         </div>
                     </div>
 
-                    {{-- BAGIAN BARU: TAMPILAN RESI --}}
-                    {{-- Hanya muncul kalau kolom 'resi' di database ada isinya --}}
+                    {{-- BAGIAN TAMPILAN RESI --}}
                     @if($order->resi)
                     <div class="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3 flex flex-col sm:flex-row justify-between items-center animate-pulse-once">
                         <div class="flex items-center gap-3">
@@ -85,8 +88,68 @@
                     </div>
                     @endif
 
+                    {{-- ======= BAGIAN BARU: LIST PRODUK & REVIEW ======= --}}
+                    <div class="mb-4 bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <h3 class="text-sm font-bold text-gray-700 mb-2">Daftar Produk:</h3>
+                        <div class="space-y-3">
+                            @foreach ($order->products as $product)
+                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-3 rounded shadow-sm">
+
+                                    {{-- Info Produk --}}
+                                    <div>
+                                        <h4 class="font-bold text-gray-800 text-sm">{{ $product->name }}</h4>
+                                        <p class="text-xs text-gray-500">
+                                            {{ $product->pivot->quantity }} x Rp {{ number_format($product->price) }}
+                                        </p>
+                                    </div>
+
+                                    {{-- TOMBOL REVIEW (Cuma Muncul kalau Status SELESAI / COMPLETED) --}}
+                                    @if(in_array(strtolower($order->status), ['selesai', 'completed']))
+                                        <div x-data="{ open: false }" class="mt-2 sm:mt-0 w-full sm:w-auto relative">
+                                            <button @click="open = !open" class="text-xs text-blue-600 font-bold hover:underline border border-blue-600 px-3 py-1 rounded hover:bg-blue-50 w-full sm:w-auto text-center">
+                                                ★ Beri Ulasan
+                                            </button>
+
+                                            {{-- Form Review Dropdown --}}
+                                            <div x-show="open"
+                                                 @click.away="open = false"
+                                                 x-transition
+                                                 class="mt-2 p-4 bg-white border border-gray-300 rounded-lg shadow-xl absolute right-0 z-20 w-72 sm:w-80">
+
+                                                <form action="{{ route('reviews.store') }}" method="POST">
+                                                    @csrf
+                                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                                    <input type="hidden" name="order_id" value="{{ $order->id }}">
+
+                                                    <label class="block text-xs font-bold mb-1 text-gray-700">Pilih Rating:</label>
+                                                    <select name="rating" class="w-full text-sm border-gray-300 rounded mb-3 focus:ring-blue-500 focus:border-blue-500">
+                                                        <option value="5">⭐⭐⭐⭐⭐ (Sempurna)</option>
+                                                        <option value="4">⭐⭐⭐⭐ (Bagus)</option>
+                                                        <option value="3">⭐⭐⭐ (Biasa)</option>
+                                                        <option value="2">⭐⭐ (Kurang)</option>
+                                                        <option value="1">⭐ (Buruk)</option>
+                                                    </select>
+
+                                                    <label class="block text-xs font-bold mb-1 text-gray-700">Komentar:</label>
+                                                    <textarea name="comment" rows="3" class="w-full text-sm border-gray-300 rounded mb-3" placeholder="Tulis pengalamanmu..."></textarea>
+
+                                                    {{-- INI BUTTONNYA BANG --}}
+                                                    <button type="submit" class="w-full bg-blue-600 border border-blue-700 text-white font-bold py-2 mt-3 rounded-lg text-sm hover:bg-blue-700 hover:shadow-lg transition duration-200">
+                                                        Kirim Ulasan
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    {{-- ================================================ --}}
+
                     {{-- Footer Card: Total & Tombol --}}
-                    <div class="flex justify-between items-center border-t pt-4">
+                    <div class="flex justify-between items-center border-t pt-4 mt-4">
                         <div>
                             <p class="text-sm text-gray-500">Total Tagihan:</p>
                             <p class="text-xl font-bold text-red-600">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</p>
@@ -97,8 +160,8 @@
                                 Upload Bukti Bayar &rarr;
                             </a>
                         @else
-                            <button disabled class="bg-gray-200 text-gray-400 px-4 py-2 rounded font-semibold text-sm cursor-not-allowed">
-                                Lihat Detail
+                            <button disabled class="bg-gray-100 text-gray-400 px-4 py-2 rounded font-semibold text-sm cursor-not-allowed">
+                                Detail
                             </button>
                         @endif
                     </div>

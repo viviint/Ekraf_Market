@@ -72,4 +72,9 @@ class User extends Authenticatable implements FilamentUser
         // Role-based access control is handled at the resource/widget level
         return true;
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

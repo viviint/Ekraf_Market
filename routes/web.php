@@ -4,7 +4,8 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\AdminController; // <--- PENTING: Tambahkan Import ini buat Admin
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 // --- Rute Umum (Bisa diakses Tamu) ---
@@ -40,6 +41,8 @@ Route::middleware('auth')->group(function () {
         return redirect()->route('filament.admin.auth.login');
     })->name('logout');
 
+    // Route untuk kirim review
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 });
 
 // --- AREA KHUSUS ADMIN (Dilindungi Gate 'admin') ---
